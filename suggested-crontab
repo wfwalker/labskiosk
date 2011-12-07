@@ -1,0 +1,3 @@
+*/5 * * * * ~/bin/bugcount.py > ~/public_html/test.html
+*/5 * * * * ~/bin/gh-python.py apps mozilla/openwebapps mozilla/apps.mozillalabs.com mozilla/appsync mozilla/soup && mv apps-report.html ~/public_html/
+*/5 * * * * ~/bin/gh-python.py pdfjs mozilla/pdf.js && mv pdfjs-report.html ~/public_html/
