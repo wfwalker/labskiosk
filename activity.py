@@ -243,8 +243,8 @@ def getAllIssuesForRepo(userAndProject):
 		if not (issue["number"] in numbers):
 			numbers.add(issue["number"])
 			issueRecord = {
-				'ts': private_strptime(issue["updated_at"][0:19]),
-				'kind': 'issue updated',
+				'ts': private_strptime(issue["created_at"][0:19]),
+				'kind': 'issue opened',
 				'category': canonicalizeCategory(userAndProject),
 				'user': canonicalizeUsername(issue["user"]["login"]),
 				'url': issue["html_url"],
@@ -257,8 +257,8 @@ def getAllIssuesForRepo(userAndProject):
 		if not (issue["number"] in numbers):
 			numbers.add(issue["number"])
 			issueRecord = {
-				'ts': private_strptime(issue["updated_at"][0:19]),
-				'kind': 'issue updated',
+				'ts': private_strptime(issue["closed_at"][0:19]),
+				'kind': 'issue closed &nbsp; <img src="http://cdn1.iconfinder.com/data/icons/pidginsmilies/beer.png" style="position:relative; top:4px; height:16px;">',
 				'category': canonicalizeCategory(userAndProject),
 				'user': canonicalizeUsername(issue["user"]["login"]),
 				'url': issue["html_url"],
