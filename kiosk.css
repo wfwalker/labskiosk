@@ -1,0 +1,35 @@
+body { font-family: Arial }
+
+a:link { text-decoration: none; color: black; }
+a:visited { text-decoration: none; color: black; }
+
+.container
+{
+	border-radius: 15px;
+	float: left;
+	text-align: center;
+	width: 200px;
+	margin: 10px;
+	padding: 30px;
+	background-color: #EEEEEE
+}
+
+.count
+{
+	font-size: 120pt
+}
+
+.label
+{
+	font-size: 30pt
+}
+
+.git-user
+{
+	font-size: 14pt;
+}
+
+.git-description
+{
+	font-size: 14pt;
+}
