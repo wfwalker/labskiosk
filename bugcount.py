@@ -56,6 +56,9 @@ def showBugsBlockingABug(inBugID):
 
 print "<html>"
 print "<head>"
+print "<link rel='icon' href='http://mozillalabs.com/wp-content/themes/labs2.0/favicon.png' type='image/png' />"
+
+print "<meta http-equiv='refresh' content='300'>"
 print "<title>Apps bug counts for Developer Preview</title>"
 print "<link href='./kiosk.css' rel='stylesheet' type='text/css' />"
 print "</head>"

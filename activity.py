@@ -334,6 +334,7 @@ def formatHTMLReport(records, titleString):
 
 	reportFile.write(u"<html>")
 	reportFile.write(u"<head>")
+	reportFile.write(u"<link rel='icon' href='http://mozillalabs.com/wp-content/themes/labs2.0/favicon.png' type='image/png' />")
 	reportFile.write(u"<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>")
 	reportFile.write(u"<meta http-equiv='refresh' content='300'>")
 	reportFile.write(u"<title>%s activity report</title>" % titleString)
