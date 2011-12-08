@@ -336,22 +336,18 @@ def formatHTMLReport(records, titleString):
 	reportFile.write(u"<head>")
 	reportFile.write(u"<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>")
 	reportFile.write(u"<meta http-equiv='refresh' content='300'>")
-	reportFile.write(u"<title>Labs Github/IRC activity Report</title>")
+	reportFile.write(u"<title>%s activity report</title>" % titleString)
 	reportFile.write(u"<link rel='stylesheet' type='text/css' media='all' href='./kiosk.css' />")
 	reportFile.write(u"<script type='text/javascript' src='./sortable.js'></script>")
 	reportFile.write(u"<body>")
 
-	reportFile.write(u"<h1>github %s activity report</h1>" % titleString)
+	reportFile.write(u"<h1>%s activity report</h1>" % titleString)
 	
 	reportFile.write(u"<table width='100%' class='sortable' id='sortabletable'>")
 
-	# reportFile.write(u"<tr><th>ts</th> <th>user</th> <th>kind</th> <th>category</th> <th>title</th></tr>")
-	# reportFile.write(u"<tr><th>user</th> <th>kind</th> <th>category</th> <th>title</th></tr>")
-
 	for record in recentRecords:
 		try:
-	#		reportFile.write(u'<tr><td style="white-space: nowrap">%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td><a href="%s">%s</a></td></tr>' % (record["ts"].strftime("%H%M"), record["user"], record["kind"], record["category"], record["url"], record["title"]))
-			reportFile.write(u'<tr><td>%s</td> <td>%s</td> <td><a href="%s">%s</a></td></tr>' % (record["user"], record["kind"], record["url"], record["title"]))
+			reportFile.write(u'<tr><td class="git-user">%s</td> <td class="git-description">%s: <a href="%s">%s</a></td></tr>' % (record["user"], record["kind"], record["url"], record["title"]))
 		except RuntimeError:
 			reportFile.write(u'<!-- runtime error -->')
 		except UnicodeEncodeError:
