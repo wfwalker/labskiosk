@@ -79,15 +79,21 @@ for component, bugID in getComponentToBlockersMap().iteritems():
     countMap[component] = countBugsBlockingABug(bugID)
     linkMap[component] = showBugsBlockingABug(bugID)
 
-needsTriageParams = "priority=--&product=Web+Apps&resolution=---"
+needsTriageParams = "priority=--&product=Web+Apps&resolution=---&status_whiteboard_type=notregexp&query_format=advanced&status_whiteboard=devPreviewNonBlocker"
 countMap["Triage"] = countBugsFromAPI("%s?%s" % (apiURLPrefix(), needsTriageParams))
 linkMap["Triage"] = "%s?%s" % (buglistURLPrefix(), needsTriageParams)
 
 for aKey in countMap.keys():
-    print "<div class='container'><div class='count'><a target='_blank' href='%s'>%d</a></div><div class='label'>%s</div></div>" % (linkMap[aKey], countMap[aKey], aKey)
+    if countMap[aKey] == 0:
+        containerStyleName = 'container-empty'
+    else:
+        containerStyleName = 'container'
+    print "<div class='%s'><div class='count'><a target='_blank' href='%s'>%d</a></div><div class='label'>%s</div></div>" % (containerStyleName, linkMap[aKey], countMap[aKey], aKey)
 
 print "<br clear='all' />"
 print "<div style='padding-top: 100px'>%s</div>" % datetime.now()
+
+# http://is.gd/DF89w9 ?
 
 print "</body>"
 print "</html>"

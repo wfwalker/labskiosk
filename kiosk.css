@@ -14,10 +14,22 @@ a:visited { text-decoration: none; color: black; }
 	background-color: #EEEEEE
 }
 
+.container-empty
+{
+	border-radius: 15px;
+	float: left;
+	text-align: center;
+	width: 200px;
+	margin: 10px;
+	padding: 30px;
+	background-color: #B2E0B2
+}
+
 .count
 {
 	font-size: 120pt
 }
+
 
 .label
 {
