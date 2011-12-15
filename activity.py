@@ -17,17 +17,18 @@ canonicalUsernames[u'anantn'] = "anant"
 canonicalUsernames[u'Anant Narayanan'] = "anant"
 canonicalUsernames[u'andreasgal'] = "andreas"
 canonicalUsernames[u'Andreas Gal'] = "andreas"
-canonicalUsernames[u'artur'] = "artur"
-canonicalUsernames[u'artur_afk'] = "artur"
-canonicalUsernames[u'arturadib'] = "artur"
-canonicalUsernames[u'Artur Adib'] = "artur"
-canonicalUsernames[u'bdahl'] = "bdahl"
-canonicalUsernames[u'bdahl-afk'] = "bdahl"
+canonicalUsernames[u'artur'] = "arturadib"
+canonicalUsernames[u'artur_afk'] = "arturadib"
+canonicalUsernames[u'arturadib'] = "arturadib"
+canonicalUsernames[u'Artur Adib'] = "arturadib"
+canonicalUsernames[u'bdahl'] = "brendandahl"
+canonicalUsernames[u'bdahl-afk'] = "brendandahl"
 canonicalUsernames[u'benadida'] = "ben"
 canonicalUsernames[u'Ben Adida'] = "ben"
 canonicalUsernames[u'brendandahl'] = "bdahl"
 canonicalUsernames[u'Brendan Dahl'] = "bdahl"
 canonicalUsernames[u'bwalker'] = "bwalker"
+canonicalUsernames[u'Chris Jones'] = 'cgjones'
 canonicalUsernames[u'dclarke'] = "dclarke"
 canonicalUsernames[u'David Clarke'] = "dclarke"
 canonicalUsernames[u'dianeloviglio'] = 'dianeloviglio'
@@ -39,6 +40,7 @@ canonicalUsernames[u'mhanson@gmail.com'] = 'mhanson'
 canonicalUsernames[u'lloyd'] = 'lloyd'
 canonicalUsernames[u'Ian Bicking'] = 'ianb'
 canonicalUsernames[u'Julian Viereck'] = 'jviereck'
+canonicalUsernames[u'Kalervo Kujala'] = 'kkujala'
 canonicalUsernames[u'lloyd|mbp'] = 'lloyd'
 canonicalUsernames[u'Lloyd Hilaiel'] = 'lloyd'
 canonicalUsernames[u'mixedpuppy'] = 'mixedpuppy'
@@ -50,7 +52,7 @@ canonicalUsernames[u'stomlinson'] = 'stomlinson'
 canonicalUsernames[u'vingtetun'] = 'vingtetun'
 canonicalUsernames[u'Vivien Nicolas'] = 'vingtetun'
 canonicalUsernames[u'wfwalker'] = 'bwalker'
-canonicalUsernames[u'Tarek Ziade'] = 'tarek'
+canonicalUsernames[u'Tarek Ziadé'] = 'tarek'
 
 canonicalCategories = {}
 canonicalCategories['mozilla/pdf.js'] = 'pdfjs'
@@ -60,6 +62,25 @@ canonicalCategories['anantn/soup'] = 'openwebapps'
 canonicalCategories['mozilla/soup'] = 'openwebapps'
 canonicalCategories['mozilla/appsync'] = 'openwebapps'
 canonicalCategories['mozilla/fx-share-addon'] = 'social'
+
+userInfo = {}
+
+def getUserInfo(userID):
+	if userInfo.has_key(userID):
+		return userInfo[userID]
+	else:
+		try:
+			conn = httplib.HTTPSConnection('api.github.com')
+			conn.request("GET", u'/users/' + userID)
+			response = demjson.decode(conn.getresponse().read())
+			userInfo[userID] = response
+			# print response['avatar_url']
+			return response
+		except:
+			# print "none for %s" % userID
+			return {}
+			
+
 
 def canonicalizeUsername(wildID):
 	if canonicalUsernames.has_key(wildID):
@@ -117,7 +138,7 @@ def getAllCommitsForRepo(userAndProject):
 				user = canonicalizeUsername(commitDetails["author"]["login"])
 			if (user == "None") and (commitDetails["committer"].has_key("login")):
 				user = canonicalizeUsername(commitDetails["committer"]["login"])
-			
+
 			# if necessary, try the name fields
 			if (user == "None") and (commitDetails["author"].has_key("name")):
 				user = canonicalizeUsername(commitDetails["author"]["name"])
@@ -127,6 +148,8 @@ def getAllCommitsForRepo(userAndProject):
 			if (commitDetails.has_key("author")):
 				if (commitDetails["author"].has_key("date") and commitDetails["author"]["date"]):
 					commitCommittedDate = private_strptime(commitDetails["author"]["date"][0:19])
+
+					getUserInfo(user)
 
 					if user == "None":
 						raise RuntimeError("Bogus username in %s" % commitDetails)
@@ -223,6 +246,30 @@ def getAllPullRequestsForRepoList(repoList):
 		allPulls.extend(getAllPullRequestsForRepo(repo))
 
 	return allPulls
+
+# ------------------------------------------------------
+
+# TODO: get issues from bugzilla with queries like this:
+# https://bugzilla.mozilla.org/buglist.cgi?list_id=1863706&resolution=---&resolution=DUPLICATE&chfieldto=Now&query_format=advanced&chfieldfrom=-1&product=Web%20Apps
+#    return "https://api-dev.bugzilla.mozilla.org/latest/bug"
+
+def recentlyUpdatedBugsFromBugzillaForWebApps():
+	completeURL = "https://api-dev.bugzilla.mozilla.org/latest/bug?chfieldto=Now&query_format=advanced&chfieldfrom=-1&product=Web%20Apps"
+	f = urllib.urlopen(completeURL)
+	resultString = f.read()
+	resultDict = demjson.decode(resultString)
+	records = []
+	for bug in resultDict["bugs"]:
+		issueRecord = {
+			'kind': 'issue updated',
+			'title': "%s %s %s" % (bug["resolution"], bug["status"], bug["summary"]),
+			'category': 'openwebapps',
+			'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=%s' % bug["id"],
+			'user': 'bugzilla'
+		}
+		records.append(issueRecord)
+		
+	return records
 
 # ------------------------------------------------------
 
@@ -326,7 +373,7 @@ def retrieveRecordsFromGitHub(repoList, hoursWindow):
 	# for record in recentRecords:
 	# 	contributors.add(record["user"])
 
-	return sorted(recentRecords, key=lambda record: record["ts"], reverse=True)
+	return sorted(recentRecords, key=lambda record: record["title"], reverse=True)
 
 
 def formatHTMLReport(records, titleString):
@@ -354,6 +401,10 @@ def formatHTMLReport(records, titleString):
 		except UnicodeEncodeError:
 			reportFile.write(u'<!-- unicode error -->')
 
+#	bugzillaRecords = recentlyUpdatedBugsFromBugzillaForWebApps()
+#	for bug in resultDict["bugs"]:
+#		print bug["resolution"], bug["status"], bug["summary"]
+
 	reportFile.write(u"</table>")
 
 	reportFile.write(u"<div style='padding-top: 100px'>%s</div>" % datetime.now())
@@ -378,6 +429,8 @@ def formatHTMLReport(records, titleString):
 # 	]
 
 recentRecords = retrieveRecordsFromGitHub(sys.argv[2:], 12)
+if (sys.argv[1] == 'apps'):
+	recentRecords.extend(recentlyUpdatedBugsFromBugzillaForWebApps())
 formatHTMLReport(recentRecords, sys.argv[1])
 
 # consider graphing things with D3://pdf.js/content/web/viewer.html?file=http://vis.stanford.edu/files/2011-D3-InfoVis.pdf
